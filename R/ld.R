@@ -5,7 +5,8 @@ require(dplyr)
 rho2halfmax = function(r, n, maxd=100000) {
   # This is a horrible hack as I can't seem to solve the below for d, and do
   # f(r, rsq, n)(r, rsq(d=1)/2, n)  to find distance of halfmaximal analytically
-  d = as.numeric(1:maxd)
+  #d = as.numeric(1:maxd)
+  d = ceiling(c(1:99, 10^((200:900)/100)))
   r2 = ((10+r*d)/((2+r*d)*(11+r*d))) *(1+((3+r*d)*(12+12*r*d+(r*d)^2))/(n*(2+r*d)*(11+r*d)))
   d[min(which(r2 < max(r2)/2))]
 }
@@ -59,17 +60,25 @@ window_halfmax = function(bcf, region, minMAF, maxMissing) {
 #'
 #' @return data.frame  columns rho, halfmax, region, nsnp
 #' @export
-windowed_halfmax = function (bcf, windowsize, slide=windowsize, minMAF=0.1, maxMissing=0.8, windows=NULL) {
+windowed_halfmax = function (bcf, windowsize=NULL, slide=windowsize, minMAF=0.1, maxMissing=0.8, windows=NULL) {
   if (is.null(windows)) {
+    if (is.null(windowsize) || is.null(slide)) stop("Invalid or missing windowsize/slide")
+    cat("Making windows\n")
     windows = bcf_getWindows(bcf, windowsize=windowsize, slide = slide)
+  } else {
+    cat("Using supplied windows\n")
   }
   window_i = seq_len(nrow(windows))
   chunks = split(window_i, ceiling(window_i / (length(window_i)/1000)))
   export=c("bcf", "windows", "minMAF", "maxMissing")
-  halfmax = foreach(chunk=chunks, .combine=rbind, .export = export) %dopar% {
-    windows[chunk,] %>%
-      dplyr::mutate(halfmax=purrr::map(region, ~ window_halfmax(bcf, .x, minMAF, maxMissing))) %>%
-      tidyr::unnest(halfmax)
+  pkgs = c("dplyr", "tidyr", "purrr", "magrittr", "boringLD")
+  halfmax = foreach(chunk=chunks, .combine=rbind, .export = export, .packages=pkgs) %dopar% {
+    ld = purrr::map_dfr(windows[chunk,]$region,
+                        ~ boringLD:::window_halfmax(bcf, .x, minMAF, maxMissing))
+    if (nrow(ld) < 1) {
+      ld =  data.frame(rho=NA, halfmax=NA, nsnp = NA)
+    }
+    cbind(windows[chunk,], ld)
   }
   halfmax
 }
