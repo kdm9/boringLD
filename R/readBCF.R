@@ -26,6 +26,7 @@ bcf_getGTandAD = function(path, region=NULL, rowsAreSamples=T, minMAF=0.0, maxMi
   ret$nSNP = nsnp
   ret$MissRate = rowSums(is.na(ret$GT))/N
   ret$AF = rowSums(ret$GT, na.rm = T)/(2*rowSums(!is.na(ret$GT)))
+  ret$AF[!is.finite(ret$AF)] = 0 # as one can get NANs due to div by 0!
   # Recode 012 to be minor allele counts
   ret$GT_minor = ret$GT
   ret$GT_minor[ret$AF>0.5,] = 2 - ret$GT_minor[ret$AF>0.5,]
@@ -34,6 +35,7 @@ bcf_getGTandAD = function(path, region=NULL, rowsAreSamples=T, minMAF=0.0, maxMi
   # Postions are zero-based in BCF, we want 1-based
   ret$POS = ret$POS + 1
   snp.keep = ret$MAF >= minMAF & ret$MissRate <= maxMissing
+  ret$nSNP = sum(snp.keep)
   for (mat in c("GT", "AD_ref", "AD_alt", "GT_minor")) {
     # Keep good SNPs
     ret[[mat]] = ret[[mat]][snp.keep,]
@@ -63,20 +65,23 @@ bcf_getContigs = function(path) {
 #' @param path Path to VCF or BCF file
 #' @param windowsize Size of each window, in bases
 #' @param slide Step size of each window, in bases
-#' @param chrom Only give windows
-#' @param from Step size of each window, in bases
+#' @param chrom Only generate windows on contig 'chrom'
+#' @param from Only generate windows starting at `from` on `chrom`
+#' @param to Only generate windows until `to` on `chrom`
 #'
 #' @export
 bcf_getWindows = function(path, windowsize=1000, slide=windowsize, chrom=NULL, from=NULL, to=NULL) {
   contigs = bcf_getContigs(path)
   res = NULL
+  if (is.null(chrom) && !is.null(from) && !is.null(to)) {
+    stop("chrom must be specified if from and to are specified")
+  }
   for (ctg in seq_len(nrow(contigs))) {
     name = contigs$names[ctg]
-    if (!is.null(chrom) && name != chrom) {next}
-    ctglen = contigs$lengths[ctg]
-    if (is.null(chrom) && (!is.null(from) || !is.null(to))) {
-      stop("chrom must be specified if from and to are specified")
+    if (!is.null(chrom) && name != chrom) {
+      next
     }
+    ctglen = contigs$lengths[ctg]
     if (!is.null(chrom) && !is.null(from) && !is.null(to)) {
       from = min(from, ctglen)
       to = min(to, ctglen) - windowsize + slide
@@ -85,7 +90,7 @@ bcf_getWindows = function(path, windowsize=1000, slide=windowsize, chrom=NULL, f
       }
     } else {
       from = 1
-      to = ctglen - windowsize
+      to = ctglen - windowsize + slide
     }
     for (start in seq(from, to, slide)) {
       stop = start + windowsize - 1

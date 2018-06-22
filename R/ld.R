@@ -25,7 +25,7 @@ window_halfmax = function(bcf, region, minMAF, maxMissing) {
   # number of SNPs
   if (is.null(geno) || geno$nSNP < 2) {
     warning("Too few SNPs for window ", region)
-    return(NULL)
+    return(data.frame(rho=NA, halfmax=NA, nsnp=0))
   }
   d = as.matrix(dist(geno$POS))
   d = d[upper.tri(d)]
@@ -34,9 +34,16 @@ window_halfmax = function(bcf, region, minMAF, maxMissing) {
 
   # fits decay eqn. from Hill & Weir, via that blog post we used in brachy paper
   n = geno$nIndiv
-  fit = nls(rsq ~ ((10+r*d)/((2+r*d)*(11+r*d))) *(1+((3+r*d)*(12+12*r*d+(r*d)^2))/(n*(2+r*d)*(11+r*d))),
-        start=c(r=0.1), control=nls.control(maxiter=100000, warnOnly=T))
-  fit = summary(fit)
+  fit = NULL
+  try({
+    fit = nls(rsq ~ ((10+r*d)/((2+r*d)*(11+r*d))) *(1+((3+r*d)*(12+12*r*d+(r*d)^2))/(n*(2+r*d)*(11+r*d))),
+          start=c(r=0.1), control=nls.control(maxiter=100000, warnOnly=T))
+    fit = summary(fit)
+  })
+  if (is.null(fit)) {
+    return(data.frame(rho=NA, halfmax=NA, nsnp=geno$nSNP))
+  }
+
 
   rho = fit$parameters[1]
   halfmax = rho2halfmax(rho, n)
@@ -45,8 +52,7 @@ window_halfmax = function(bcf, region, minMAF, maxMissing) {
     rho = NA
     halfmax = NA
   }
-
-  return(data.frame(rho=rho, halfmax=halfmax, nsnp = geno$nSNP, stringsAsFactors = F))
+  data.frame(rho=rho, halfmax=halfmax, nsnp = geno$nSNP, stringsAsFactors = F)
 }
 
 #' windowed_halfmax
@@ -72,13 +78,15 @@ windowed_halfmax = function (bcf, windowsize=NULL, slide=windowsize, minMAF=0.1,
   chunks = split(window_i, ceiling(window_i / (length(window_i)/1000)))
   export=c("bcf", "windows", "minMAF", "maxMissing")
   pkgs = c("dplyr", "tidyr", "purrr", "magrittr", "boringLD")
-  halfmax = foreach(chunk=chunks, .combine=rbind, .export = export, .packages=pkgs) %dopar% {
-    ld = purrr::map_dfr(windows[chunk,]$region,
-                        ~ boringLD:::window_halfmax(bcf, .x, minMAF, maxMissing))
-    if (nrow(ld) < 1) {
-      ld =  data.frame(rho=NA, halfmax=NA, nsnp = NA)
-    }
-    cbind(windows[chunk,], ld)
+  halfmax = foreach(chunk=chunks, .combine=dplyr::bind_rows, .export = export, .packages=pkgs) %dopar% {
+    ld = purrr::map_dfr(windows[chunk,]$region, function (reg) {
+            tryCatch({
+              boringLD:::window_halfmax(bcf, reg, minMAF, maxMissing)
+            }, function (err) {
+              data.frame(rho=NA, halfmax=NA, nsnp=NA)
+            })
+          })
+    dplyr::bind_cols(windows[chunk,], ld)
   }
   halfmax
 }
