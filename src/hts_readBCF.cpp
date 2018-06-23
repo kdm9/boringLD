@@ -11,13 +11,16 @@ using namespace std;
 
 
 // [[Rcpp::export]]
-List readBCFQuery_(SEXP fname, SEXP reg) {
+List readBCFQuery_(SEXP fname, SEXP reg, SEXP samplenames) {
   string filename = as<string>(fname);
   string region = as<string>(reg);
-  gusld::BCFReader rdr(filename);
-  vector<string> ctg_names;
-  vector<int32_t> ctg_lenghts;
+  vector<string> request_samples = as<vector<string>>(samplenames);
+  KDMBCF::BCFReader rdr(filename);
 
+  if (request_samples.size() > 0) {
+      rdr.set_samples(request_samples);
+  }
+  vector<string> samples = rdr.get_sample_names();
   if (region == "") {
     rdr.read_all();
   } else {
@@ -28,6 +31,7 @@ List readBCFQuery_(SEXP fname, SEXP reg) {
     Named("CHROM")=wrap(rdr.CHROM),
     Named("POS")=wrap(rdr.POS),
     Named("GT")=wrap(rdr.GT),
+    Named("Samples")=wrap(samples),
     Named("AD_ref")=wrap(rdr.AD_ref),
     Named("AD_alt")=wrap(rdr.AD_alt)
     );
@@ -36,7 +40,7 @@ List readBCFQuery_(SEXP fname, SEXP reg) {
 // [[Rcpp::export]]
 List readBCFContigs_(SEXP fname) {
   string filename = as<string>(fname);
-  gusld::BCFReader rdr(filename);
+  KDMBCF::BCFReader rdr(filename);
   vector<string> ctg_names;
   vector<int32_t> ctg_lenghts;
 

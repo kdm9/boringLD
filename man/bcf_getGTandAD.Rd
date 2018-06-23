@@ -5,14 +5,16 @@
 \title{Reads gentoype (0, 1, 2, NA coded) and allele depths from BCF. Optionally,
 reads only from a specific region of the reference.}
 \usage{
-bcf_getGTandAD(path, region = NULL, rowsAreSamples = T, minMAF = 0,
-  maxMissing = 1)
+bcf_getGTandAD(path, region = NULL, samples = NULL, rowsAreSamples = T,
+  minMAF = 0, maxMissing = 1)
 }
 \arguments{
 \item{path}{Path to VCF or BCF file}
 
 \item{region}{A region (like 'Chr1:1-1000') to extract. `path` must be an
 indexed BCF if this option is used.}
+
+\item{samples}{Extract gentypes of only `samples`. Default NULL = all.}
 
 \item{rowsAreSamples}{If TRUE, transpose GT and AD matricies so rows are
 samples and SNPs are columns. This is the opposite of a BCF.}

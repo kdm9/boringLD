@@ -4,7 +4,7 @@
 \alias{window_halfmax}
 \title{window_halfmax}
 \usage{
-window_halfmax(bcf, region, minMAF, maxMissing)
+window_halfmax(bcf, region, minMAF, maxMissing, geno = NULL)
 }
 \arguments{
 \item{bcf}{Indexed BCF or VCF file}

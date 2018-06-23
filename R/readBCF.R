@@ -4,11 +4,13 @@
 #' @param path Path to VCF or BCF file
 #' @param region A region (like 'Chr1:1-1000') to extract. `path` must be an
 #'        indexed BCF if this option is used.
+#' @param samples Extract gentypes of only `samples`. Default NULL = all.
 #' @param rowsAreSamples If TRUE, transpose GT and AD matricies so rows are
 #'        samples and SNPs are columns. This is the opposite of a BCF.
-bcf_getGTandAD = function(path, region=NULL, rowsAreSamples=T, minMAF=0.0, maxMissing=1) {
-  if (is.null(region)) region = "";
-  ret = readBCFQuery_(path, region)
+bcf_getGTandAD = function(path, region=NULL, samples=NULL, rowsAreSamples=T, minMAF=0.0, maxMissing=1) {
+  if (is.null(region)) region = ""
+  if (is.null(samples)) samples = character(0)
+  ret = readBCFQuery_(path, region, samples)
   nsnp = length(ret$POS)
   if (nsnp < 1) {
     warning("No SNPs in region")
@@ -39,6 +41,7 @@ bcf_getGTandAD = function(path, region=NULL, rowsAreSamples=T, minMAF=0.0, maxMi
   for (mat in c("GT", "AD_ref", "AD_alt", "GT_minor")) {
     # Keep good SNPs
     ret[[mat]] = ret[[mat]][snp.keep,]
+    colnames(ret[[mat]]) = ret$Samples
     if (rowsAreSamples) {
       ret[[mat]] = t(ret[[mat]])
     }

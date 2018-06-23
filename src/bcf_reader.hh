@@ -6,7 +6,7 @@
 #include <htslib/hts.h>
 #include <htslib/vcf.h>
 
-namespace gusld {
+namespace KDMBCF {
 
 using namespace std;
 
@@ -30,6 +30,29 @@ public:
     bcf_hdr_destroy(header);
     bcf_destroy(record);
     bcf_close(bcf);
+  }
+
+  vector<string> get_sample_names()
+  {
+      vector<string> samples;
+      for (int32_t i = 0; i < nsamp; i++) {
+          samples.push_back(header->samples[i]);
+      }
+      return samples;
+  }
+
+  bool set_samples(const vector<string> &samples)
+  {
+      string samplecsv = "";
+      for (size_t i = 0; i < samples.size(); i++) {
+          samplecsv += samples[i];
+          if (i < samples.size() - 1)
+              samplecsv += ",";
+      }
+      int res = bcf_hdr_set_samples(header, samplecsv.c_str(), 0);
+      nsamp = bcf_hdr_nsamples(header);
+      if (res != 0 || nsamp != samples.size()) return false;
+      return true;
   }
 
   bool get_contig_names_lengths(vector<string> &names, vector<int32_t> &lengths)

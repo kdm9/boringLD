@@ -6,14 +6,15 @@
 using namespace Rcpp;
 
 // readBCFQuery_
-List readBCFQuery_(SEXP fname, SEXP reg);
-RcppExport SEXP _boringLD_readBCFQuery_(SEXP fnameSEXP, SEXP regSEXP) {
+List readBCFQuery_(SEXP fname, SEXP reg, SEXP samplenames);
+RcppExport SEXP _boringLD_readBCFQuery_(SEXP fnameSEXP, SEXP regSEXP, SEXP samplenamesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type fname(fnameSEXP);
     Rcpp::traits::input_parameter< SEXP >::type reg(regSEXP);
-    rcpp_result_gen = Rcpp::wrap(readBCFQuery_(fname, reg));
+    Rcpp::traits::input_parameter< SEXP >::type samplenames(samplenamesSEXP);
+    rcpp_result_gen = Rcpp::wrap(readBCFQuery_(fname, reg, samplenames));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -30,7 +31,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_boringLD_readBCFQuery_", (DL_FUNC) &_boringLD_readBCFQuery_, 2},
+    {"_boringLD_readBCFQuery_", (DL_FUNC) &_boringLD_readBCFQuery_, 3},
     {"_boringLD_readBCFContigs_", (DL_FUNC) &_boringLD_readBCFContigs_, 1},
     {NULL, NULL, 0}
 };

@@ -14,9 +14,11 @@ bcf_getWindows(path, windowsize = 1000, slide = windowsize, chrom = NULL,
 
 \item{slide}{Step size of each window, in bases}
 
-\item{chrom}{Only give windows}
+\item{chrom}{Only generate windows on contig 'chrom'}
 
-\item{from}{Step size of each window, in bases}
+\item{from}{Only generate windows starting at `from` on `chrom`}
+
+\item{to}{Only generate windows until `to` on `chrom`}
 }
 \description{
 Generate a list of regions which slide over the genome
