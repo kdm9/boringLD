@@ -71,8 +71,9 @@ windowed_halfmax = function (bcf, windowsize=NULL, slide=windowsize, minMAF=0.1,
     if (is.null(windowsize) || is.null(slide)) stop("Invalid or missing windowsize/slide")
     cat("Making windows\n")
     windows = bcf_getWindows(bcf, windowsize=windowsize, slide = slide)
+    cat(paste("Using", nrow(windows), "generated windows\n"))
   } else {
-    cat("Using supplied windows\n")
+    cat(paste("Using", nrow(windows), "user-supplied windows\n"))
   }
   window_i = seq_len(nrow(windows))
   chunks = split(window_i, ceiling(window_i / (length(window_i)/1000)))
