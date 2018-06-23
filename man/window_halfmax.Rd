@@ -4,7 +4,8 @@
 \alias{window_halfmax}
 \title{window_halfmax}
 \usage{
-window_halfmax(bcf, region, minMAF, maxMissing, geno = NULL)
+window_halfmax(bcf, region, minMAF = 0, maxMissing = 1, geno = NULL,
+  samples = NULL)
 }
 \arguments{
 \item{bcf}{Indexed BCF or VCF file}
@@ -14,6 +15,8 @@ window_halfmax(bcf, region, minMAF, maxMissing, geno = NULL)
 \item{minMAF}{Minimum SNP minor allle freq}
 
 \item{maxMissing}{Maximum SNP missing data rate}
+
+\item{samples}{Set of samples to calculate LD among}
 }
 \value{
 data.frame with one row and columns rho, halfmax, region, nsnp

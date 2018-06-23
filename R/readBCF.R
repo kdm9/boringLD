@@ -13,7 +13,6 @@ bcf_getGTandAD = function(path, region=NULL, samples=NULL, rowsAreSamples=T, min
   ret = readBCFQuery_(path, region, samples)
   nsnp = length(ret$POS)
   if (nsnp < 1) {
-    warning("No SNPs in region")
     return(NULL)
   }
   # matrixify the matrices
@@ -52,6 +51,13 @@ bcf_getGTandAD = function(path, region=NULL, samples=NULL, rowsAreSamples=T, min
   ret
 }
 
+#' Reads samples names from BCF/VCF
+#'
+#' @param path Path to VCF or BCF file
+#' @export
+bcf_getSamples = function(path) {
+  readBCFSamples_(path)
+}
 
 #' Reads contig names and lengths from BCF file as a data frame.
 #'

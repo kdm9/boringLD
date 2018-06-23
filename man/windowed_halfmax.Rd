@@ -4,9 +4,9 @@
 \alias{windowed_halfmax}
 \title{windowed_halfmax}
 \usage{
-windowed_halfmax(bcf, windowsize = NULL, slide = windowsize, minMAF = 0.1,
-  maxMissing = 0.8, windows = NULL, chrom = NULL, from = NULL,
-  to = NULL, errors = "stop")
+windowed_halfmax(bcf, windowsize = NULL, slide = windowsize,
+  samples = NULL, minMAF = 0.1, maxMissing = 0.8, windows = NULL,
+  chrom = NULL, from = NULL, to = NULL, errors = "stop")
 }
 \arguments{
 \item{bcf}{Indexed BCF or VCF file}
@@ -15,11 +15,13 @@ windowed_halfmax(bcf, windowsize = NULL, slide = windowsize, minMAF = 0.1,
 
 \item{slide}{Number of bases to skip between each window start (default `windowsize`)}
 
+\item{samples}{Set of samples to calculate LD among}
+
 \item{minMAF}{Minimum SNP minor allle freq}
 
 \item{maxMissing}{Maximum SNP missing data rate}
 
-\item{windows}{restrict analyses to these windows (expected to be created with bcf_getWindows)}
+\item{windows}{Restrict analyses to these windows (expected to be created with bcf_getWindows)}
 
 \item{chrom}{Only generate windows on contig 'chrom'}
 

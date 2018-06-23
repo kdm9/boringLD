@@ -9,3 +9,7 @@ readBCFContigs_ <- function(fname) {
     .Call('_boringLD_readBCFContigs_', PACKAGE = 'boringLD', fname)
 }
 
+readBCFSamples_ <- function(fname) {
+    .Call('_boringLD_readBCFSamples_', PACKAGE = 'boringLD', fname)
+}
+

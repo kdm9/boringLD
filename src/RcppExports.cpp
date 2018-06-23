@@ -29,10 +29,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// readBCFSamples_
+CharacterVector readBCFSamples_(SEXP fname);
+RcppExport SEXP _boringLD_readBCFSamples_(SEXP fnameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type fname(fnameSEXP);
+    rcpp_result_gen = Rcpp::wrap(readBCFSamples_(fname));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_boringLD_readBCFQuery_", (DL_FUNC) &_boringLD_readBCFQuery_, 3},
     {"_boringLD_readBCFContigs_", (DL_FUNC) &_boringLD_readBCFContigs_, 1},
+    {"_boringLD_readBCFSamples_", (DL_FUNC) &_boringLD_readBCFSamples_, 1},
     {NULL, NULL, 0}
 };
 

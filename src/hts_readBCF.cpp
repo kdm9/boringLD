@@ -18,13 +18,13 @@ List readBCFQuery_(SEXP fname, SEXP reg, SEXP samplenames) {
   KDMBCF::BCFReader rdr(filename);
 
   if (request_samples.size() > 0) {
-      rdr.set_samples(request_samples);
+      if (!rdr.set_samples(request_samples)) return NULL;
   }
   vector<string> samples = rdr.get_sample_names();
   if (region == "") {
-    rdr.read_all();
+    if (!rdr.read_all()) return NULL;
   } else {
-    rdr.read_region(region);
+    if (!rdr.read_region(region)) return NULL;
   }
 
   return List::create(
@@ -48,4 +48,11 @@ List readBCFContigs_(SEXP fname) {
 
   return List::create(Named("names")=wrap(ctg_names),
                       Named("lengths")=wrap(ctg_lenghts));
+}
+
+// [[Rcpp::export]]
+CharacterVector readBCFSamples_(SEXP fname) {
+  KDMBCF::BCFReader rdr(as<string>(fname));
+
+  return wrap(rdr.get_sample_names());
 }

@@ -49,9 +49,11 @@ public:
           if (i < samples.size() - 1)
               samplecsv += ",";
       }
-      int res = bcf_hdr_set_samples(header, samplecsv.c_str(), 0);
+      if (bcf_hdr_set_samples(header, samplecsv.c_str(), 0) != 0) {
+          return false;
+      }
       nsamp = bcf_hdr_nsamples(header);
-      if (res != 0 || nsamp != samples.size()) return false;
+      if (nsamp != samples.size()) return false;
       return true;
   }
 
