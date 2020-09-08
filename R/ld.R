@@ -24,7 +24,7 @@ rho2halfmax = function(r, n, maxd=100000) {
 window_halfmax = function(bcf, region, minMAF=0., maxMissing=1., geno=NULL,
                           samples=NULL) {
   if (is.null(geno)) {
-    geno = bcf_getGTandAD(bcf, region, minMAF=minMAF, maxMissing=maxMissing,
+    geno = bcf_getGT(bcf, region, minMAF=minMAF, maxMissing=maxMissing,
                           samples=samples)
   }
   if (is.null(geno) || geno$nSNP < 2) {

@@ -3,7 +3,6 @@
 \docType{package}
 \name{boringLD}
 \alias{boringLD}
-\alias{boringLD-package}
 \title{boringLD}
 \description{
 Simple ways of calculating LD as half-maximal r^2 in windows across the genome

@@ -4,8 +4,14 @@
 \alias{window_halfmax}
 \title{window_halfmax}
 \usage{
-window_halfmax(bcf, region, minMAF = 0, maxMissing = 1, geno = NULL,
-  samples = NULL)
+window_halfmax(
+  bcf,
+  region,
+  minMAF = 0,
+  maxMissing = 1,
+  geno = NULL,
+  samples = NULL
+)
 }
 \arguments{
 \item{bcf}{Indexed BCF or VCF file}

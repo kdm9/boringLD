@@ -4,9 +4,19 @@
 \alias{windowed_halfmax}
 \title{windowed_halfmax}
 \usage{
-windowed_halfmax(bcf, windowsize = NULL, slide = windowsize,
-  samples = NULL, minMAF = 0.1, maxMissing = 0.8, windows = NULL,
-  chrom = NULL, from = NULL, to = NULL, errors = "stop")
+windowed_halfmax(
+  bcf,
+  windowsize = NULL,
+  slide = windowsize,
+  samples = NULL,
+  minMAF = 0.1,
+  maxMissing = 0.8,
+  windows = NULL,
+  chrom = NULL,
+  from = NULL,
+  to = NULL,
+  errors = "stop"
+)
 }
 \arguments{
 \item{bcf}{Indexed BCF or VCF file}

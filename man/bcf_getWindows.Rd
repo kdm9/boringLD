@@ -4,8 +4,14 @@
 \alias{bcf_getWindows}
 \title{Generate a list of regions which slide over the genome}
 \usage{
-bcf_getWindows(path, windowsize = 1000, slide = windowsize, chrom = NULL,
-  from = NULL, to = NULL)
+bcf_getWindows(
+  path,
+  windowsize = 1000,
+  slide = windowsize,
+  chrom = NULL,
+  from = NULL,
+  to = NULL
+)
 }
 \arguments{
 \item{path}{Path to VCF or BCF file}
