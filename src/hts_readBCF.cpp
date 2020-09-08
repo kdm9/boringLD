@@ -3,6 +3,7 @@
 #include <htslib/hts.h>
 #include <htslib/vcf.h>
 #include <vector>
+#undef KDM_BCF_READER_USE_AD
 #include "bcf_reader.hh"
 
 using namespace Rcpp;
@@ -31,9 +32,11 @@ List readBCFQuery_(SEXP fname, SEXP reg, SEXP samplenames) {
     Named("CHROM")=wrap(rdr.CHROM),
     Named("POS")=wrap(rdr.POS),
     Named("GT")=wrap(rdr.GT),
-    Named("Samples")=wrap(samples),
-    Named("AD_ref")=wrap(rdr.AD_ref),
-    Named("AD_alt")=wrap(rdr.AD_alt)
+    Named("Samples")=wrap(samples)
+#ifdef KDM_BCF_READER_USE_AD
+    , Named("AD_ref")=wrap(rdr.AD_ref)
+    , Named("AD_alt")=wrap(rdr.AD_alt)
+#endif
     );
 }
 

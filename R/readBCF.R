@@ -5,9 +5,9 @@
 #' @param region A region (like 'Chr1:1-1000') to extract. `path` must be an
 #'        indexed BCF if this option is used.
 #' @param samples Extract gentypes of only `samples`. Default NULL = all.
-#' @param rowsAreSamples If TRUE, transpose GT and AD matricies so rows are
+#' @param rowsAreSamples If TRUE, transpose GT matrix so rows are
 #'        samples and SNPs are columns. This is the opposite of a BCF.
-bcf_getGTandAD = function(path, region=NULL, samples=NULL, rowsAreSamples=T, minMAF=0.0, maxMissing=1) {
+bcf_getGT = function(path, region=NULL, samples=NULL, rowsAreSamples=T, minMAF=0.0, maxMissing=1) {
   if (is.null(region)) region = ""
   if (is.null(samples)) samples = character(0)
   ret = readBCFQuery_(path, region, samples)
@@ -17,8 +17,8 @@ bcf_getGTandAD = function(path, region=NULL, samples=NULL, rowsAreSamples=T, min
   }
   # matrixify the matrices
   ret$GT = matrix(unlist(ret$GT, recursive = F), nrow=nsnp, byrow = T)
-  ret$AD_ref = matrix(unlist(ret$AD_ref, recursive = F), nrow=nsnp, byrow = T)
-  ret$AD_alt = matrix(unlist(ret$AD_alt, recursive = F), nrow=nsnp, byrow = T)
+  #ret$AD_ref = matrix(unlist(ret$AD_ref, recursive = F), nrow=nsnp, byrow = T)
+  #ret$AD_alt = matrix(unlist(ret$AD_alt, recursive = F), nrow=nsnp, byrow = T)
   # Adjust missing gentoypes: -1 is missing in C++ output
   ret$GT[ret$GT<0] = NA
   # Missing rate and AF
@@ -37,7 +37,8 @@ bcf_getGTandAD = function(path, region=NULL, samples=NULL, rowsAreSamples=T, min
   ret$POS = ret$POS + 1
   snp.keep = ret$MAF >= minMAF & ret$MissRate <= maxMissing
   ret$nSNP = sum(snp.keep)
-  for (mat in c("GT", "AD_ref", "AD_alt", "GT_minor")) {
+  #for (mat in c("GT", "AD_ref", "AD_alt", "GT_minor")) {
+  for (mat in c("GT", "GT_minor")) {
     # Keep good SNPs
     ret[[mat]] = ret[[mat]][snp.keep,]
     colnames(ret[[mat]]) = ret$Samples

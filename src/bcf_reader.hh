@@ -72,19 +72,24 @@ public:
 
   bool read_region(const string &region)
   {
+    bool ret = false;
     CHROM.clear();
     POS.clear();
     GT.clear();
+#ifdef KDM_BCF_READER_USE_AD
     AD_ref.clear();
     AD_alt.clear();
+#endif
     hts_idx_t *idx = bcf_index_load(filename.c_str());
     hts_itr_t *iter;
     iter = bcf_itr_querys(idx, header, region.c_str());
     while(bcf_itr_next(bcf, iter, record) == 0) {
       process_record();
+      ret=true; // We got at least one good record
     }
     bcf_itr_destroy(iter);
     hts_idx_destroy(idx);
+    return ret;
   }
 
   bool read_all()
@@ -92,18 +97,25 @@ public:
     CHROM.clear();
     POS.clear();
     GT.clear();
+#ifdef KDM_BCF_READER_USE_AD
     AD_ref.clear();
     AD_alt.clear();
+#endif
+    bool ret = false;
     while(bcf_read(bcf, header, record) == 0) {
       process_record();
+      ret = true; // we got at least one good rec
     }
+    return ret;
   }
 
   vector< string > CHROM;
   vector< uint64_t > POS;
   Mat2d<int32_t> GT;
+#ifdef KDM_BCF_READER_USE_AD
   Mat2d<int32_t> AD_ref;
   Mat2d<int32_t> AD_alt;
+#endif
 
 protected:
   htsFile *bcf = NULL;
@@ -116,13 +128,18 @@ protected:
 
   void process_record()
   {
-      vector<int32_t> GT1, AD_ref1, AD_alt1;
+      vector<int32_t> GT1;
+#ifdef KDM_BCF_READER_USE_AD
+      vector<int32_t> AD_ref1, AD_alt1;
+#endif
       if (!bcf_is_snp(record) ||   record->n_allele > 2) return;
       if (!get_GT(GT1)) return;
-      if (!get_AD(AD_ref1, AD_alt1)) return;
       GT.push_back(GT1);
+#ifdef KDM_BCF_READER_USE_AD
+      if (!get_AD(AD_ref1, AD_alt1)) return;
       AD_ref.push_back(AD_ref1);
       AD_alt.push_back(AD_alt1);
+#endif
       CHROM.emplace_back(bcf_hdr_id2name(header, record->rid));
       POS.push_back(record->pos);
   }
