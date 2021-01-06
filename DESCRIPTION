@@ -1,13 +1,13 @@
 Package: boringLD
 Type: Package
 Title: Simple Genome-window Calculation of LD
-Version: 0.2.0
+Version: 0.3.0
 Author: Kevin Murray
 Maintainer: Kevin Murray <foss@kdmurray.id.au>
-Description: Calcualates half-maximal R2 over genome
-License: MPL-2
+Description: Calcualates linkage disequilibrium across the genome, estimating LD as half-maximal correlation distance.
+License: Mozilla Public License 2.0 | file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp, doFuture, foreach, boot
-LinkingTo: Rcpp
+Imports: foreach, boot, windowlickr, purrr, magrittr, dplyr, tidyr
 RoxygenNote: 7.1.1
+Remotes: github::kdm9/windowlickr

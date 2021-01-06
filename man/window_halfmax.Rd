@@ -22,6 +22,8 @@ window_halfmax(
 
 \item{maxMissing}{Maximum SNP missing data rate}
 
+\item{geno}{Alternative to bcf/region, one can give a genotype matrix as extracted by windowlickr::bcf_getGT here}
+
 \item{samples}{Set of samples to calculate LD among}
 }
 \value{

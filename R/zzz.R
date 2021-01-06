@@ -5,6 +5,6 @@
 #' @name boringLD
 #' @docType package
 #' @author Kevin Murray
-#' @import Rcpp boot doFuture foreach dplyr purrr
-#' @useDynLib boringLD
+#' @import boot foreach
+#' @importFrom stats cor dist nls nls.control
 NULL

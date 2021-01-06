@@ -1,6 +1,6 @@
-require(doFuture)
 require(foreach)
-require(dplyr)
+require(boot)
+require(stats)
 
 rho2halfmax = function(r, n, maxd=100000) {
   # This is a horrible hack as I can't seem to solve the below for d, and do
@@ -18,13 +18,14 @@ rho2halfmax = function(r, n, maxd=100000) {
 #' @param samples Set of samples to calculate LD among
 #' @param minMAF Minimum SNP minor allle freq
 #' @param maxMissing Maximum SNP missing data rate
+#' @param geno Alternative to bcf/region, one can give a genotype matrix as extracted by windowlickr::bcf_getGT here
 #'
 #' @return data.frame with one row and columns rho, halfmax, region, nsnp
 #' @export
 window_halfmax = function(bcf, region, minMAF=0., maxMissing=1., geno=NULL,
                           samples=NULL) {
   if (is.null(geno)) {
-    geno = bcf_getGT(bcf, region, minMAF=minMAF, maxMissing=maxMissing,
+    geno = windowlickr:::bcf_getGT(bcf, region, minMAF=minMAF, maxMissing=maxMissing,
                           samples=samples)
   }
   if (is.null(geno) || geno$nSNP < 2) {
@@ -75,7 +76,7 @@ windowed_halfmax = function (bcf, windowsize=NULL, slide=windowsize, samples=NUL
   if (is.null(windows)) {
     if (is.null(windowsize) || is.null(slide)) stop("Invalid or missing windowsize/slide")
     cat("Making windows\n")
-    windows = bcf_getWindows(bcf, windowsize=windowsize, slide = slide,
+    windows = windowlickr::bcf_getWindows(bcf, windowsize=windowsize, slide = slide,
                              chrom=chrom, from=from, to=to)
     cat(paste("Using", nrow(windows), "generated windows\n"))
   } else {
@@ -89,7 +90,7 @@ windowed_halfmax = function (bcf, windowsize=NULL, slide=windowsize, samples=NUL
                     .packages=pkgs, .errorhandling=errors) %dopar% {
     ld = purrr::map_dfr(windows[chunk,]$region, function (reg) {
             tryCatch({
-              boringLD:::window_halfmax(bcf, reg, minMAF, maxMissing, samples=samples)
+              window_halfmax(bcf, reg, minMAF, maxMissing, samples=samples)
             }, error=function (err) {
               data.frame(rho=NA, halfmax=NA, nsnp=NA)
             })
